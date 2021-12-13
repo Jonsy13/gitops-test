@@ -223,7 +223,7 @@ spec:
             spec:
               appinfo:
                 appns: default
-                applabel: app=nginx-1
+                applabel: app=nginx-2
                 appkind: deployment
               engineState: active
               chaosServiceAccount: litmus-admin
