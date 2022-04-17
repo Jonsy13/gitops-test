@@ -4,14 +4,13 @@ metadata:
   creationTimestamp: null
   labels:
     cluster_id: 44caf93f-fd16-4f09-9a9d-84550eab19db
-    subject: custom-chaos-workflow_litmus
     workflow_id: 2ae72e55-7188-4194-9508-b64f40865c35
     workflows.argoproj.io/controller-instanceid: 44caf93f-fd16-4f09-9a9d-84550eab19db
   name: custom-chaos-workflow-1650212374
   namespace: litmus
 spec:
   concurrencyPolicy: Forbid
-  schedule: 50 0-23 * * *
+  schedule: 51 0-23 * * *
   startingDeadlineSeconds: 0
   timezone: Asia/Calcutta
   workflowMetadata:
