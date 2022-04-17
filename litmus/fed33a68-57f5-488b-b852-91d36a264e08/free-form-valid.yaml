@@ -1,0 +1,75 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    cluster_id: f3e3ffd8-4f1b-4eda-857a-368a0ddd2d26
+    subject: free-form-valid_litmus
+    workflow_id: e878f42a-f96d-4e08-bd7a-9915aa91b8c9
+    workflows.argoproj.io/controller-instanceid: f3e3ffd8-4f1b-4eda-857a-368a0ddd2d26
+  name: free-form-valid
+  namespace: litmus
+spec:
+  arguments: {}
+  entrypoint: diamond
+  templates:
+  - dag:
+      tasks:
+      - arguments: {}
+        name: A
+        template: pass
+      - arguments: {}
+        depends: A
+        name: B
+        template: pass
+      - arguments: {}
+        depends: A
+        name: C
+        template: fail
+      - arguments: {}
+        depends: A && (C.Succeeded || C.Failed)
+        name: should-execute-1
+        template: pass
+      - arguments: {}
+        depends: B || C
+        name: should-execute-2
+        template: pass
+      - arguments: {}
+        depends: B && C
+        name: should-not-execute
+        template: pass
+      - arguments: {}
+        depends: should-execute-2.Succeeded || should-not-execute
+        name: should-execute-3
+        template: pass
+    inputs: {}
+    metadata: {}
+    name: diamond
+    outputs: {}
+  - container:
+      command:
+      - sh
+      - -c
+      - exit 0
+      image: alpine:3.7
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: pass
+    outputs: {}
+  - container:
+      command:
+      - sh
+      - -c
+      - exit 1
+      image: alpine:3.7
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: fail
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
