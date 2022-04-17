@@ -16,6 +16,7 @@ spec:
   workflowMetadata:
     creationTimestamp: null
     labels:
+      jjjj: weqwqw
       cluster_id: 44caf93f-fd16-4f09-9a9d-84550eab19db
       workflow_id: fc8b3a83-e45b-4bf5-833b-ff90540ee9f3
       workflows.argoproj.io/controller-instanceid: 44caf93f-fd16-4f09-9a9d-84550eab19db
