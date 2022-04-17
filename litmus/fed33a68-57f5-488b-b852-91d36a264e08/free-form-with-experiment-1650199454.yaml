@@ -4,8 +4,8 @@ metadata:
   creationTimestamp: null
   labels:
     cluster_id: f3e3ffd8-4f1b-4eda-857a-368a0ddd2d26
-    subject: free-form-with-experiment_litmus
-    workflow_id: 45e40cc1-3bbf-49f2-80e5-864024b2bd83
+    subject: free-form-with-experiment-1650199454_litmus
+    workflow_id: 9b80e8c8-839f-45b4-b7bd-6f13b94134ae
     workflows.argoproj.io/controller-instanceid: f3e3ffd8-4f1b-4eda-857a-368a0ddd2d26
   name: free-form-with-experiment-1650199454
   namespace: litmus
@@ -29,11 +29,14 @@ spec:
         name: install-chaos-experiments
         template: install-chaos-experiments
     - - arguments: {}
-        name: pod-delete
-        template: pod-delete
+        name: pod-cpu-hog-exec
+        template: pod-cpu-hog-exec
+    - - arguments: {}
+        name: whale-test
+        template: whale-test
   - container:
       args:
-      - kubectl apply -f /tmp/pod-delete.yaml -n {{workflow.parameters.adminModeNamespace}}
+      - kubectl apply -f /tmp/pod-cpu-hog-exec.yaml -n {{workflow.parameters.adminModeNamespace}}
         |  sleep 30
       command:
       - sh
@@ -43,19 +46,19 @@ spec:
       resources: {}
     inputs:
       artifacts:
-      - name: pod-delete
-        path: /tmp/pod-delete.yaml
+      - name: pod-cpu-hog-exec
+        path: /tmp/pod-cpu-hog-exec.yaml
         raw:
           data: |
             apiVersion: litmuschaos.io/v1alpha1
             description:
               message: |
-                Deletes a pod belonging to a deployment/statefulset/daemonset
+                Injects cpu consumption on pods belonging to an app deployment
             kind: ChaosExperiment
             metadata:
-              name: pod-delete
+              name: pod-cpu-hog-exec
               labels:
-                name: pod-delete
+                name: pod-cpu-hog-exec
                 app.kubernetes.io/part-of: litmus
                 app.kubernetes.io/component: chaosexperiment
                 app.kubernetes.io/version: 2.7.0
@@ -166,28 +169,29 @@ spec:
                 imagePullPolicy: Always
                 args:
                   - -c
-                  - ./experiments -name pod-delete
+                  - ./experiments -name pod-cpu-hog-exec
                 command:
                   - /bin/bash
                 env:
                   - name: TOTAL_CHAOS_DURATION
-                    value: "15"
-                  - name: RAMP_TIME
-                    value: ""
-                  - name: FORCE
-                    value: "true"
-                  - name: CHAOS_INTERVAL
-                    value: "5"
+                    value: "60"
+                  - name: CPU_CORES
+                    value: "1"
                   - name: PODS_AFFECTED_PERC
+                    value: ""
+                  - name: RAMP_TIME
                     value: ""
                   - name: LIB
                     value: litmus
+                  - name: CHAOS_KILL_COMMAND
+                    value: kill $(find /proc -name exe -lname '*/md5sum' 2>&1 | grep -v 'Permission
+                      denied' | awk -F/ '{print $(NF-1)}')
                   - name: TARGET_PODS
                     value: ""
                   - name: SEQUENCE
                     value: parallel
                 labels:
-                  name: pod-delete
+                  name: pod-cpu-hog-exec
                   app.kubernetes.io/part-of: litmus
                   app.kubernetes.io/component: experiment-job
                   app.kubernetes.io/version: 2.7.0
@@ -196,50 +200,78 @@ spec:
     outputs: {}
   - container:
       args:
-      - -file=/tmp/chaosengine-pod-delete.yaml
+      - -file=/tmp/chaosengine-pod-cpu-hog-exec.yaml
       - -saveName=/tmp/engine-name
       image: litmuschaos/litmus-checker:2.7.0
       name: ""
       resources: {}
     inputs:
       artifacts:
-      - name: pod-delete
-        path: /tmp/chaosengine-pod-delete.yaml
+      - name: pod-cpu-hog-exec
+        path: /tmp/chaosengine-pod-cpu-hog-exec.yaml
         raw:
           data: |
             apiVersion: litmuschaos.io/v1alpha1
             kind: ChaosEngine
             metadata:
               namespace: "{{workflow.parameters.adminModeNamespace}}"
-              generateName: pod-delete
+              generateName: pod-cpu-hog-exec
               labels:
-                instance_id: bf52d214-6834-4106-85f0-b6db44295fc0
                 workflow_name: free-form-with-experiment-1650199454
             spec:
+              engineState: active
               appinfo:
                 appns: default
                 applabel: app=nginx
                 appkind: deployment
-              engineState: active
               chaosServiceAccount: litmus-admin
               experiments:
-                - name: pod-delete
+                - name: pod-cpu-hog-exec
                   spec:
                     components:
                       env:
                         - name: TOTAL_CHAOS_DURATION
-                          value: "30"
-                        - name: CHAOS_INTERVAL
-                          value: "10"
-                        - name: FORCE
-                          value: "false"
+                          value: "60"
+                        - name: CPU_CORES
+                          value: "4"
                         - name: PODS_AFFECTED_PERC
                           value: ""
+                    probe: []
+              annotationCheck: "false"
     metadata:
       labels:
         weight: "10"
-    name: pod-delete
+    name: pod-cpu-hog-exec
     outputs: {}
+  - inputs: {}
+    metadata: {}
+    name: whale-test
+    outputs: {}
+    script:
+      command:
+      - python
+      env:
+      - name: PYTHONUNBUFFERED
+        value: "1"
+      image: python:3.7
+      name: ""
+      resources: {}
+      source: |
+        import time
+        import random
+        messages = [
+            'No Color',
+            '\x1b[30m%s\x1b[0m' % 'FG Black',
+            '\x1b[32m%s\x1b[0m' % 'FG Green',
+            '\x1b[34m%s\x1b[0m' % 'FG Blue',
+            '\x1b[36m%s\x1b[0m' % 'FG Cyan',
+            '\x1b[41m%s\x1b[0m' % 'BG Red',
+            '\x1b[43m%s\x1b[0m' % 'BG Yellow',
+            '\x1b[45m%s\x1b[0m' % 'BG Magenta',
+        ]
+        for i in range(1, 100):
+          print(random.choice(messages))
+          time.sleep(1)
 status:
   finishedAt: null
   startedAt: null
