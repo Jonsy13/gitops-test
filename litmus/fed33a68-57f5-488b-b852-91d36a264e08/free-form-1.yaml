@@ -1,0 +1,76 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    cluster_id: f3e3ffd8-4f1b-4eda-857a-368a0ddd2d26
+    subject: free-form-1_litmus
+    workflow_id: 4965ccc0-7ade-4cb1-936e-d72ad6815944
+    workflows.argoproj.io/controller-instanceid: f3e3ffd8-4f1b-4eda-857a-368a0ddd2d26
+  name: free-form-1
+  namespace: litmus
+spec:
+  arguments: {}
+  entrypoint: workflow
+  templates:
+  - dag:
+      tasks:
+      - arguments: {}
+        name: A
+        template: whalesay
+      - arguments: {}
+        depends: A
+        name: B
+        template: intentional-fail
+      - arguments: {}
+        depends: A
+        name: C
+        template: whalesay
+      - arguments: {}
+        depends: B.Failed && C
+        name: D
+        template: whalesay
+      - arguments: {}
+        depends: A
+        name: E
+        template: intentional-fail
+      - arguments: {}
+        depends: A
+        name: F
+        template: whalesay
+      - arguments: {}
+        depends: E && F
+        name: G
+        template: whalesay
+    inputs: {}
+    metadata: {}
+    name: workflow
+    outputs: {}
+  - container:
+      args:
+      - hello world
+      command:
+      - cowsay
+      image: docker/whalesay:latest
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: whalesay
+    outputs: {}
+  - container:
+      args:
+      - echo intentional failure; exit 1
+      command:
+      - sh
+      - -c
+      image: alpine:latest
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: intentional-fail
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
