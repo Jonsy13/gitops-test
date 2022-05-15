@@ -5,7 +5,6 @@ metadata:
   labels:
     cluster_id: f0114ef0-d834-4830-a7f4-486e86656684
     subject: custom-chaos-workflow_litmus
-    workflow_id: 2188dc6e-3e7f-4661-9b03-bcebfb143dda
     workflows.argoproj.io/controller-instanceid: f0114ef0-d834-4830-a7f4-486e86656684
     sgdshd: wsdwdw
     sdsd: wewe
