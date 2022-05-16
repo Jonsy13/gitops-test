@@ -7,6 +7,7 @@ metadata:
     subject: custom-chaos-workflow_litmus
     workflow_id: 64dfc270-dfcb-4041-9e9d-3f723d06376a
     workflows.argoproj.io/controller-instanceid: 65c0cb39-6f80-4d3b-9cc5-51a4fd04db57
+    sdwsdsd: wewe
   name: custom-chaos-workflow-1652687235
   namespace: litmus
 spec:
