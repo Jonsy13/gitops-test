@@ -1,0 +1,264 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  creationTimestamp: null
+  labels:
+    cluster_id: 65c0cb39-6f80-4d3b-9cc5-51a4fd04db57
+    subject: a_litmus
+    workflow_id: ca9503a1-3a20-499e-8b11-b28d504d4f5d
+    workflows.argoproj.io/controller-instanceid: 65c0cb39-6f80-4d3b-9cc5-51a4fd04db57
+  name: a-1652688685
+  namespace: litmus
+spec:
+  concurrencyPolicy: Forbid
+  schedule: 42 13 * * Mon
+  startingDeadlineSeconds: 0
+  timezone: Asia/Calcutta
+  workflowMetadata:
+    creationTimestamp: null
+    labels:
+      cluster_id: 65c0cb39-6f80-4d3b-9cc5-51a4fd04db57
+      workflow_id: ca9503a1-3a20-499e-8b11-b28d504d4f5d
+      workflows.argoproj.io/controller-instanceid: 65c0cb39-6f80-4d3b-9cc5-51a4fd04db57
+  workflowSpec:
+    arguments:
+      parameters:
+      - name: adminModeNamespace
+        value: litmus
+    entrypoint: custom-chaos
+    imagePullSecrets:
+    - name: ddd
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+    serviceAccountName: argo-chaos
+    templates:
+    - inputs: {}
+      metadata: {}
+      name: custom-chaos
+      outputs: {}
+      steps:
+      - - arguments: {}
+          name: install-chaos-experiments
+          template: install-chaos-experiments
+      - - arguments: {}
+          name: pod-delete-vyv
+          template: pod-delete-vyv
+    - container:
+        args:
+        - kubectl apply -f /tmp/pod-delete-vyv.yaml -n {{workflow.parameters.adminModeNamespace}}
+          |  sleep 30
+        command:
+        - sh
+        - -c
+        image: docker.io/chaosnative/k8s:2.8.0
+        name: ""
+        resources: {}
+      inputs:
+        artifacts:
+        - name: pod-delete-vyv
+          path: /tmp/pod-delete-vyv.yaml
+          raw:
+            data: |
+              apiVersion: litmuschaos.io/v1alpha1
+              description:
+                message: |
+                  Deletes a pod belonging to a deployment/statefulset/daemonset
+              kind: ChaosExperiment
+              metadata:
+                name: pod-delete
+                labels:
+                  name: pod-delete
+                  app.kubernetes.io/part-of: litmus
+                  app.kubernetes.io/component: chaosexperiment
+                  app.kubernetes.io/version: 2.8.0
+              spec:
+                definition:
+                  scope: Namespaced
+                  permissions:
+                    - apiGroups:
+                        - ""
+                      resources:
+                        - pods
+                      verbs:
+                        - create
+                        - delete
+                        - get
+                        - list
+                        - patch
+                        - update
+                        - deletecollection
+                    - apiGroups:
+                        - ""
+                      resources:
+                        - events
+                      verbs:
+                        - create
+                        - get
+                        - list
+                        - patch
+                        - update
+                    - apiGroups:
+                        - ""
+                      resources:
+                        - configmaps
+                      verbs:
+                        - get
+                        - list
+                    - apiGroups:
+                        - ""
+                      resources:
+                        - pods/log
+                      verbs:
+                        - get
+                        - list
+                        - watch
+                    - apiGroups:
+                        - ""
+                      resources:
+                        - pods/exec
+                      verbs:
+                        - get
+                        - list
+                        - create
+                    - apiGroups:
+                        - apps
+                      resources:
+                        - deployments
+                        - statefulsets
+                        - replicasets
+                        - daemonsets
+                      verbs:
+                        - list
+                        - get
+                    - apiGroups:
+                        - apps.openshift.io
+                      resources:
+                        - deploymentconfigs
+                      verbs:
+                        - list
+                        - get
+                    - apiGroups:
+                        - ""
+                      resources:
+                        - replicationcontrollers
+                      verbs:
+                        - get
+                        - list
+                    - apiGroups:
+                        - argoproj.io
+                      resources:
+                        - rollouts
+                      verbs:
+                        - list
+                        - get
+                    - apiGroups:
+                        - batch
+                      resources:
+                        - jobs
+                      verbs:
+                        - create
+                        - list
+                        - get
+                        - delete
+                        - deletecollection
+                    - apiGroups:
+                        - litmuschaos.io
+                      resources:
+                        - chaosengines
+                        - chaosexperiments
+                        - chaosresults
+                      verbs:
+                        - create
+                        - list
+                        - get
+                        - patch
+                        - update
+                        - delete
+                  image: docker.io/chaosnative/go-runner:2.8.0
+                  imagePullPolicy: Always
+                  args:
+                    - -c
+                    - ./experiments -name pod-delete
+                  command:
+                    - /bin/bash
+                  env:
+                    - name: TOTAL_CHAOS_DURATION
+                      value: "15"
+                    - name: RAMP_TIME
+                      value: ""
+                    - name: FORCE
+                      value: "true"
+                    - name: CHAOS_INTERVAL
+                      value: "5"
+                    - name: PODS_AFFECTED_PERC
+                      value: ""
+                    - name: LIB
+                      value: litmus
+                    - name: TARGET_PODS
+                      value: ""
+                    - name: NODE_LABEL
+                      value: ""
+                    - name: SEQUENCE
+                      value: parallel
+                  labels:
+                    name: pod-delete
+                    app.kubernetes.io/part-of: litmus
+                    app.kubernetes.io/component: experiment-job
+                    app.kubernetes.io/version: 2.8.0
+      metadata: {}
+      name: install-chaos-experiments
+      outputs: {}
+    - container:
+        args:
+        - -file=/tmp/chaosengine-pod-delete-vyv.yaml
+        - -saveName=/tmp/engine-name
+        image: docker.io/chaosnative/litmus-checker:2.8.0
+        name: ""
+        resources: {}
+      inputs:
+        artifacts:
+        - name: pod-delete-vyv
+          path: /tmp/chaosengine-pod-delete-vyv.yaml
+          raw:
+            data: |
+              apiVersion: litmuschaos.io/v1alpha1
+              kind: ChaosEngine
+              metadata:
+                namespace: "{{workflow.parameters.adminModeNamespace}}"
+                generateName: pod-delete-vyv
+                labels:
+                  instance_id: 0806aaa8-9115-4e6a-83a9-a28f6c490680
+                  context: pod-delete-vyv_a999
+                  workflow_name: a-1652688685
+              spec:
+                appinfo:
+                  appns: a999
+                  applabel: release=prometheus-stack
+                  appkind: deployment
+                engineState: active
+                chaosServiceAccount: litmus-admin
+                experiments:
+                  - name: pod-delete
+                    spec:
+                      components:
+                        env:
+                          - name: TOTAL_CHAOS_DURATION
+                            value: "30"
+                          - name: CHAOS_INTERVAL
+                            value: "10"
+                          - name: FORCE
+                            value: "false"
+                          - name: PODS_AFFECTED_PERC
+                            value: ""
+                      probe: []
+                annotationCheck: "false"
+      metadata:
+        labels:
+          weight: "10"
+      name: pod-delete-vyv
+      outputs: {}
+status:
+  active: null
+  conditions: null
+  lastScheduledTime: null
