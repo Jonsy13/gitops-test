@@ -4,14 +4,13 @@ metadata:
   creationTimestamp: null
   labels:
     cluster_id: 65c0cb39-6f80-4d3b-9cc5-51a4fd04db57
-    subject: test_litmus
     workflow_id: 52bdc58c-c203-4ae8-9a4c-ce299bbb3227
     workflows.argoproj.io/controller-instanceid: 65c0cb39-6f80-4d3b-9cc5-51a4fd04db57
   name: test-1652688326
   namespace: litmus
 spec:
   concurrencyPolicy: Forbid
-  schedule: 36 0-23 * * *
+  schedule: 40 13 * * Mon
   startingDeadlineSeconds: 0
   timezone: Asia/Calcutta
   workflowMetadata:
