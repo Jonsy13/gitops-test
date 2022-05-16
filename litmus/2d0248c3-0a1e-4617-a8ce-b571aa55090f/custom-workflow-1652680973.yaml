@@ -1,0 +1,82 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    cluster_id: 44e60583-487f-4e42-b083-f27c4d346bca
+    subject: custom-workflow-1652680973_a999
+    workflow_id: ca4eeacd-d091-4dc2-bada-b423ef5b0f18
+    workflows.argoproj.io/controller-instanceid: 44e60583-487f-4e42-b083-f27c4d346bca
+  name: custom-workflow-1652680973
+  namespace: a999
+spec:
+  arguments: {}
+  entrypoint: diamond
+  serviceAccountName: argo-chaos
+  templates:
+  - container:
+      command:
+      - echo
+      - '{{inputs.parameters.message}}'
+      image: alpine:3.7
+      name: ""
+      resources: {}
+    inputs:
+      parameters:
+      - name: message
+    metadata: {}
+    name: echo
+    outputs: {}
+  - inputs:
+      parameters:
+      - name: message
+    metadata: {}
+    name: echo-thrice
+    outputs: {}
+    steps:
+    - - arguments:
+          parameters:
+          - name: message
+            value: '{{inputs.parameters.message}}{{item}}'
+        name: echo
+        template: echo
+        withItems:
+        - 1
+        - 2
+        - 3
+  - dag:
+      tasks:
+      - arguments:
+          parameters:
+          - name: message
+            value: A
+        name: A
+        template: echo-thrice
+      - arguments:
+          parameters:
+          - name: message
+            value: B
+        depends: A
+        name: B
+        template: echo-thrice
+      - arguments:
+          parameters:
+          - name: message
+            value: C
+        depends: A
+        name: C
+        template: echo-thrice
+      - arguments:
+          parameters:
+          - name: message
+            value: D
+        depends: B && C
+        name: D
+        template: echo-thrice
+    inputs: {}
+    metadata: {}
+    name: diamond
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
