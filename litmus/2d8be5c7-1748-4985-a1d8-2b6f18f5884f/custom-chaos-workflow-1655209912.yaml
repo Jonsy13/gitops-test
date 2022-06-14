@@ -5,6 +5,7 @@ metadata:
   labels:
     cluster_id: e2d7298e-cbdf-43e6-8898-a6f177092e93
     subject: custom-chaos-workflow_litmus
+    workflow_id: 062979d1-3e4f-4c0f-8f6d-d0787aa9e779
     workflows.argoproj.io/controller-instanceid: e2d7298e-cbdf-43e6-8898-a6f177092e93
     www: www
   name: custom-chaos-workflow-1655209912
