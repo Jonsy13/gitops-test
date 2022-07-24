@@ -7,6 +7,7 @@ metadata:
     subject: custom-chaos-scenario_a1
     workflow_id: 46b4df0d-bb4e-44fd-a5b1-1f288d43d03c
     workflows.argoproj.io/controller-instanceid: 9512ecf9-40c2-43d6-83d6-5df7179094b1
+    sss: ssss
   name: custom-chaos-scenario-1658673246
   namespace: a1
 spec:
