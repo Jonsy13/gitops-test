@@ -4,9 +4,10 @@ metadata:
   creationTimestamp: null
   labels:
     cluster_id: 9512ecf9-40c2-43d6-83d6-5df7179094b1
-    subject: custom-chaos-scenario_a1
-    workflows.argoproj.io/controller-instanceid: 9512ecf9-40c2-43d6-83d6-5df7179094b1
     sss: ssss
+    subject: custom-chaos-scenario_a1
+    workflow_id: e50358cc-c11f-41a8-b77e-6bb35e65687a
+    workflows.argoproj.io/controller-instanceid: 9512ecf9-40c2-43d6-83d6-5df7179094b1
   name: custom-chaos-scenario-1658673240
   namespace: a1
 spec:
