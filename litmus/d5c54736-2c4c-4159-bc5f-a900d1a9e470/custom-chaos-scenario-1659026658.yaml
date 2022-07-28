@@ -5,6 +5,7 @@ metadata:
   labels:
     cluster_id: bb28ae16-50eb-46c4-9e2a-d605ff6d5bfa
     subject: custom-chaos-scenario_litmus
+    workflow_id: c73af7b2-e174-465c-a3b7-bd78b9d7cffa
     workflows.argoproj.io/controller-instanceid: bb28ae16-50eb-46c4-9e2a-d605ff6d5bfa
   name: custom-chaos-scenario-1659026658
   namespace: litmus
