@@ -235,7 +235,7 @@ spec:
                     components:
                       env:
                         - name: TOTAL_CHAOS_DURATION
-                          value: "30"
+                          value: "45"
                         - name: CHAOS_INTERVAL
                           value: "10"
                         - name: FORCE
