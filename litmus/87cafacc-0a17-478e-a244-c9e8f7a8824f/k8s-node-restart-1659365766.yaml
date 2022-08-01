@@ -1,0 +1,242 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    cluster_id: afb7e508-80c0-4c5b-98c3-bec987b9ae8d
+    subject: k8s-node-restart_litmus
+    workflow_id: d83b88a8-47f0-47f3-83e1-4e3fc63b3c46
+    workflows.argoproj.io/controller-instanceid: afb7e508-80c0-4c5b-98c3-bec987b9ae8d
+  name: k8s-node-restart-1659365766
+  namespace: litmus
+spec:
+  arguments:
+    parameters:
+    - name: adminModeNamespace
+      value: litmus
+  entrypoint: custom-chaos
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: argo-chaos
+  templates:
+  - inputs: {}
+    metadata: {}
+    name: custom-chaos
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: install-chaos-experiments
+        template: install-chaos-experiments
+    - - arguments: {}
+        name: node-restart-1yp
+        template: node-restart-1yp
+    - - arguments: {}
+        name: revert-chaos
+        template: revert-chaos
+  - container:
+      args:
+      - kubectl apply -f /tmp/node-restart-1yp.yaml -n {{workflow.parameters.adminModeNamespace}}
+        |  sleep 30
+      command:
+      - sh
+      - -c
+      image: chaosnative/k8s:2.11.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: node-restart-1yp
+        path: /tmp/node-restart-1yp.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            description:
+              message: |
+                Restart node
+            kind: ChaosExperiment
+            metadata:
+              name: node-restart
+              labels:
+                name: node-restart
+                app.kubernetes.io/part-of: litmus
+                app.kubernetes.io/component: chaosexperiment
+                app.kubernetes.io/version: 2.11.0
+            spec:
+              definition:
+                scope: Cluster
+                permissions:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods
+                    verbs:
+                      - create
+                      - delete
+                      - get
+                      - list
+                      - patch
+                      - update
+                      - deletecollection
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - events
+                    verbs:
+                      - create
+                      - get
+                      - list
+                      - patch
+                      - update
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - configmaps
+                      - secrets
+                    verbs:
+                      - get
+                      - list
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/log
+                    verbs:
+                      - get
+                      - list
+                      - watch
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/exec
+                    verbs:
+                      - get
+                      - list
+                      - create
+                  - apiGroups:
+                      - batch
+                    resources:
+                      - jobs
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - delete
+                      - deletecollection
+                  - apiGroups:
+                      - litmuschaos.io
+                    resources:
+                      - chaosengines
+                      - chaosexperiments
+                      - chaosresults
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - patch
+                      - update
+                      - delete
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - nodes
+                    verbs:
+                      - get
+                      - list
+                image: chaosnative/go-runner:ci
+                imagePullPolicy: Always
+                args:
+                  - -c
+                  - ./experiments -name node-restart
+                command:
+                  - /bin/bash
+                env:
+                  - name: SSH_USER
+                    value: root
+                  - name: TOTAL_CHAOS_DURATION
+                    value: "60"
+                  - name: RAMP_TIME
+                    value: ""
+                  - name: LIB
+                    value: litmus
+                  - name: LIB_IMAGE
+                    value: chaosnative/go-runner:ci
+                  - name: TARGET_NODE
+                    value: ""
+                  - name: NODE_LABEL
+                    value: ""
+                  - name: TARGET_NODE_IP
+                    value: ""
+                  - name: REBOOT_COMMAND
+                    value: sudo systemctl reboot; true
+                labels:
+                  name: node-restart
+                  app.kubernetes.io/part-of: litmus
+                  app.kubernetes.io/component: experiment-job
+                  app.kubernetes.io/version: 2.11.0
+                secrets:
+                  - name: id-rsa
+                    mountPath: /mnt/
+    metadata: {}
+    name: install-chaos-experiments
+    outputs: {}
+  - container:
+      args:
+      - -file=/tmp/chaosengine-node-restart-1yp.yaml
+      - -saveName=/tmp/engine-name
+      image: chaosnative/litmus-checker:2.11.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: node-restart-1yp
+        path: /tmp/chaosengine-node-restart-1yp.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            kind: ChaosEngine
+            metadata:
+              namespace: "{{workflow.parameters.adminModeNamespace}}"
+              generateName: node-restart-1yp
+              labels:
+                instance_id: 536f9b69-fdff-4ffc-bb8c-85f060afe2a7
+                workflow_name: k8s-node-restart-1659365766
+            spec:
+              engineState: active
+              auxiliaryAppInfo: ""
+              chaosServiceAccount: litmus-admin
+              experiments:
+                - name: node-restart
+                  spec:
+                    components:
+                      env:
+                        - name: TOTAL_CHAOS_DURATION
+                          value: "60"
+                        - name: TARGET_NODE
+                          value: ""
+                        - name: TARGET_NODE_IP
+                          value: ""
+                        - name: SSH_USER
+                          value: ""
+                    probe: []
+    metadata:
+      labels:
+        weight: "10"
+    name: node-restart-1yp
+    outputs: {}
+  - container:
+      args:
+      - 'kubectl delete chaosengine -l ''instance_id in (536f9b69-fdff-4ffc-bb8c-85f060afe2a7,
+        )'' -n {{workflow.parameters.adminModeNamespace}} '
+      command:
+      - sh
+      - -c
+      image: chaosnative/k8s:2.8.0
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: revert-chaos
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
