@@ -1,0 +1,292 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    cluster_id: afb7e508-80c0-4c5b-98c3-bec987b9ae8d
+    subject: custom-chaos-scenario_litmus
+    workflow_id: ca7c84b9-1370-402e-8dd3-5aed0467a06b
+    workflows.argoproj.io/controller-instanceid: afb7e508-80c0-4c5b-98c3-bec987b9ae8d
+  name: custom-chaos-scenario-1659369416
+  namespace: litmus
+spec:
+  arguments:
+    parameters:
+    - name: adminModeNamespace
+      value: litmus
+  entrypoint: custom-chaos
+  podGC:
+    strategy: OnWorkflowCompletion
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: argo-chaos
+  templates:
+  - inputs: {}
+    metadata: {}
+    name: custom-chaos
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: install-chaos-experiments
+        template: install-chaos-experiments
+    - - arguments: {}
+        name: vmware-http-response-modify-0cs
+        template: vmware-http-response-modify-0cs
+    - - arguments: {}
+        name: revert-chaos
+        template: revert-chaos
+  - container:
+      args:
+      - kubectl apply -f /tmp/vmware-http-response-modify-0cs.yaml -n {{workflow.parameters.adminModeNamespace}}
+        |  sleep 30
+      command:
+      - sh
+      - -c
+      image: chaosnative/k8s:2.11.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: vmware-http-response-modify-0cs
+        path: /tmp/vmware-http-response-modify-0cs.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            description:
+              message: >
+                It injects chaos inside the VM which modifies the status code of the
+                response from the provided application server to desired status code
+                provided by the user and reverts after a specified duration
+            kind: ChaosExperiment
+            metadata:
+              name: vmware-http-response-modify
+              labels:
+                name: vmware-http-response-modify
+                app.kubernetes.io/part-of: litmus
+                app.kubernetes.io/component: chaosexperiment
+                app.kubernetes.io/version: latest
+            spec:
+              definition:
+                scope: Namespaced
+                permissions:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods
+                    verbs:
+                      - create
+                      - delete
+                      - get
+                      - list
+                      - patch
+                      - update
+                      - deletecollection
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - events
+                    verbs:
+                      - create
+                      - get
+                      - list
+                      - patch
+                      - update
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - configmaps
+                    verbs:
+                      - get
+                      - list
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/log
+                    verbs:
+                      - get
+                      - list
+                      - watch
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/exec
+                    verbs:
+                      - get
+                      - list
+                      - create
+                  - apiGroups:
+                      - apps
+                    resources:
+                      - deployments
+                      - statefulsets
+                      - replicasets
+                      - daemonsets
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - apps.openshift.io
+                    resources:
+                      - deploymentconfigs
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - replicationcontrollers
+                    verbs:
+                      - get
+                      - list
+                  - apiGroups:
+                      - argoproj.io
+                    resources:
+                      - rollouts
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - batch
+                    resources:
+                      - jobs
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - delete
+                      - deletecollection
+                  - apiGroups:
+                      - litmuschaos.io
+                    resources:
+                      - chaosengines
+                      - chaosexperiments
+                      - chaosresults
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - patch
+                      - update
+                      - delete
+                image: chaosnative/go-runner:ci
+                imagePullPolicy: Always
+                args:
+                  - -c
+                  - ./experiments -name vmware-http-response-modify
+                command:
+                  - /bin/bash
+                env:
+                  - name: GOVC_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: vcenter-secret
+                        key: VCENTERSERVER
+                  - name: GOVC_USERNAME
+                    valueFrom:
+                      secretKeyRef:
+                        name: vcenter-secret
+                        key: VCENTERUSER
+                  - name: GOVC_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: vcenter-secret
+                        key: VCENTERPASS
+                  - name: GOVC_INSECURE
+                    value: "true"
+                  - name: LIB_IMAGE
+                    value: chaosnative/go-runner:ci
+                  - name: STATUS_CODE
+                    value: ""
+                  - name: MODIFY_RESPONSE_BODY
+                    value: "true"
+                  - name: TARGET_SERVICE_PORT
+                    value: "80"
+                  - name: PROXY_PORT
+                    value: "8080"
+                  - name: NETWORK_INTERFACE
+                    value: ens160
+                  - name: TOTAL_CHAOS_DURATION
+                    value: "60"
+                  - name: RAMP_TIME
+                    value: ""
+                  - name: LIB
+                    value: litmus
+                  - name: SEQUENCE
+                    value: parallel
+                labels:
+                  name: vmware-http-response-modify
+                  app.kubernetes.io/part-of: litmus
+                  app.kubernetes.io/component: experiment-job
+                  app.kubernetes.io/version: latest
+    metadata: {}
+    name: install-chaos-experiments
+    outputs: {}
+  - container:
+      args:
+      - -file=/tmp/chaosengine-vmware-http-response-modify-0cs.yaml
+      - -saveName=/tmp/engine-name
+      image: chaosnative/litmus-checker:2.11.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: vmware-http-response-modify-0cs
+        path: /tmp/chaosengine-vmware-http-response-modify-0cs.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            kind: ChaosEngine
+            metadata:
+              generateName: vmware-http-response-modify-0cs
+              namespace: "{{workflow.parameters.adminModeNamespace}}"
+              labels:
+                instance_id: db0e40cf-d4dd-40d2-b9c0-fcc93bcc4f44
+                workflow_name: custom-chaos-scenario-1659369416
+            spec:
+              engineState: active
+              chaosServiceAccount: litmus-admin
+              experiments:
+                - name: vmware-http-response-modify
+                  spec:
+                    components:
+                      env:
+                        - name: TOTAL_CHAOS_DURATION
+                          value: "30"
+                        - name: CHAOS_INTERVAL
+                          value: "10"
+                        - name: VM_NAME
+                          value: vm2
+                        - name: VM_USER_NAME
+                          value: vm2
+                        - name: VM_PASSWORD
+                          value: "123"
+                        - name: STATUS_CODE
+                          value: "500"
+                        - name: MODIFY_RESPONSE_BODY
+                          value: "true"
+                        - name: TARGET_SERVICE_PORT
+                          value: "80"
+                    probe: []
+    metadata:
+      labels:
+        weight: "10"
+    name: vmware-http-response-modify-0cs
+    outputs: {}
+  - container:
+      args:
+      - 'kubectl delete chaosengine -l ''instance_id in (db0e40cf-d4dd-40d2-b9c0-fcc93bcc4f44,
+        )'' -n {{workflow.parameters.adminModeNamespace}} '
+      command:
+      - sh
+      - -c
+      image: chaosnative/k8s:2.11.0
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: revert-chaos
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
