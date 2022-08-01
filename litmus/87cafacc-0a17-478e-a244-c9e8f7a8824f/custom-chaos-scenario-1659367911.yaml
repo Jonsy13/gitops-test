@@ -1,0 +1,280 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    cluster_id: afb7e508-80c0-4c5b-98c3-bec987b9ae8d
+    subject: custom-chaos-scenario_litmus
+    workflow_id: f710d4b6-9bec-4204-8e0e-0f0431381386
+    workflows.argoproj.io/controller-instanceid: afb7e508-80c0-4c5b-98c3-bec987b9ae8d
+  name: custom-chaos-scenario-1659367911
+  namespace: litmus
+spec:
+  arguments:
+    parameters:
+    - name: adminModeNamespace
+      value: litmus
+  entrypoint: custom-chaos
+  podGC:
+    strategy: OnWorkflowCompletion
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  serviceAccountName: argo-chaos
+  templates:
+  - inputs: {}
+    metadata: {}
+    name: custom-chaos
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: install-chaos-experiments
+        template: install-chaos-experiments
+    - - arguments: {}
+        name: pod-http-reset-peer-y0h
+        template: pod-http-reset-peer-y0h
+    - - arguments: {}
+        name: revert-chaos
+        template: revert-chaos
+  - container:
+      args:
+      - kubectl apply -f /tmp/pod-http-reset-peer-y0h.yaml -n {{workflow.parameters.adminModeNamespace}}
+        |  sleep 30
+      command:
+      - sh
+      - -c
+      image: chaosnative/k8s:2.11.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: pod-http-reset-peer-y0h
+        path: /tmp/pod-http-reset-peer-y0h.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            description:
+              message: >
+                it injects chaos into the pod which stops outgoing http requests by
+                resetting the TCP connection and then reverts back to the original state
+                after a specified duration
+            kind: ChaosExperiment
+            metadata:
+              name: pod-http-reset-peer
+              labels:
+                name: pod-http-reset-peer
+                app.kubernetes.io/part-of: litmus
+                app.kubernetes.io/component: chaosexperiment
+                app.kubernetes.io/version: latest
+            spec:
+              definition:
+                scope: Namespaced
+                permissions:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods
+                    verbs:
+                      - create
+                      - delete
+                      - get
+                      - list
+                      - patch
+                      - update
+                      - deletecollection
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - events
+                    verbs:
+                      - create
+                      - get
+                      - list
+                      - patch
+                      - update
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - configmaps
+                    verbs:
+                      - get
+                      - list
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/log
+                    verbs:
+                      - get
+                      - list
+                      - watch
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods/exec
+                    verbs:
+                      - get
+                      - list
+                      - create
+                  - apiGroups:
+                      - apps
+                    resources:
+                      - deployments
+                      - statefulsets
+                      - replicasets
+                      - daemonsets
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - apps.openshift.io
+                    resources:
+                      - deploymentconfigs
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - replicationcontrollers
+                    verbs:
+                      - get
+                      - list
+                  - apiGroups:
+                      - argoproj.io
+                    resources:
+                      - rollouts
+                    verbs:
+                      - list
+                      - get
+                  - apiGroups:
+                      - batch
+                    resources:
+                      - jobs
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - delete
+                      - deletecollection
+                  - apiGroups:
+                      - litmuschaos.io
+                    resources:
+                      - chaosengines
+                      - chaosexperiments
+                      - chaosresults
+                    verbs:
+                      - create
+                      - list
+                      - get
+                      - patch
+                      - update
+                      - delete
+                image: chaosnative/go-runner:ci
+                imagePullPolicy: Always
+                args:
+                  - -c
+                  - ./experiments -name vmware-http-reset-peer
+                command:
+                  - /bin/bash
+                env:
+                  - name: GOVC_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: vcenter-secret
+                        key: VCENTERSERVER
+                  - name: GOVC_USERNAME
+                    valueFrom:
+                      secretKeyRef:
+                        name: vcenter-secret
+                        key: VCENTERUSER
+                  - name: GOVC_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: vcenter-secret
+                        key: VCENTERPASS
+                  - name: GOVC_INSECURE
+                    value: "true"
+                  - name: LIB_IMAGE
+                    value: chaosnative/go-runner:ci
+                  - name: RESET_TIMEOUT
+                    value: "2000"
+                  - name: TARGET_SERVICE_PORT
+                    value: "80"
+                  - name: PROXY_PORT
+                    value: "8080"
+                  - name: NETWORK_INTERFACE
+                    value: ens160
+                  - name: TOTAL_CHAOS_DURATION
+                    value: "60"
+                  - name: RAMP_TIME
+                    value: ""
+                  - name: LIB
+                    value: litmus
+                  - name: SEQUENCE
+                    value: parallel
+                labels:
+                  name: pod-http-reset-peer
+                  app.kubernetes.io/part-of: litmus
+                  app.kubernetes.io/component: experiment-job
+                  app.kubernetes.io/version: latest
+    metadata: {}
+    name: install-chaos-experiments
+    outputs: {}
+  - container:
+      args:
+      - -file=/tmp/chaosengine-pod-http-reset-peer-y0h.yaml
+      - -saveName=/tmp/engine-name
+      image: chaosnative/litmus-checker:2.11.0
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: pod-http-reset-peer-y0h
+        path: /tmp/chaosengine-pod-http-reset-peer-y0h.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            kind: ChaosEngine
+            metadata:
+              namespace: "{{workflow.parameters.adminModeNamespace}}"
+              generateName: pod-http-reset-peer-y0h
+              labels:
+                instance_id: ba65d0d1-f0ad-4071-b67b-cb676447a697
+                workflow_name: custom-chaos-scenario-1659367911
+            spec:
+              engineState: active
+              chaosServiceAccount: litmus-admin
+              experiments:
+                - name: pod-http-reset-peer
+                  spec:
+                    components:
+                      env:
+                        - name: TOTAL_CHAOS_DURATION
+                          value: "60"
+                        - name: RESET_TIMEOUT
+                          value: "4000"
+                        - name: TARGET_SERVICE_PORT
+                          value: "80"
+                    probe: []
+    metadata:
+      labels:
+        weight: "10"
+    name: pod-http-reset-peer-y0h
+    outputs: {}
+  - container:
+      args:
+      - 'kubectl delete chaosengine -l ''instance_id in (ba65d0d1-f0ad-4071-b67b-cb676447a697,
+        )'' -n {{workflow.parameters.adminModeNamespace}} '
+      command:
+      - sh
+      - -c
+      image: chaosnative/k8s:2.11.0
+      name: ""
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: revert-chaos
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
