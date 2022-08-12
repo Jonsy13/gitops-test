@@ -5,6 +5,7 @@ metadata:
   labels:
     cluster_id: e00e90ad-2709-464e-b3fc-41bf9824d314
     subject: custom_litmus
+    workflow_id: 9c682273-4c47-4434-8f91-08a8168a5f49
     workflows.argoproj.io/controller-instanceid: e00e90ad-2709-464e-b3fc-41bf9824d314
   name: custom-1660292832
   namespace: litmus
