@@ -7,6 +7,7 @@ metadata:
     subject: custom_litmus
     workflow_id: fb1fb057-0dfe-4716-b255-9b26e6ab1999
     workflows.argoproj.io/controller-instanceid: e00e90ad-2709-464e-b3fc-41bf9824d314
+    ssss: sssd
   name: custom-1660292831
   namespace: litmus
 spec:
