@@ -5,6 +5,7 @@ metadata:
   labels:
     cluster_id: da72522d-d302-473e-8cdb-682602aa2a5c
     subject: custom_n1
+    workflow_id: 1be43f8d-a985-422e-9601-4a5bf2f7f501
     workflows.argoproj.io/controller-instanceid: da72522d-d302-473e-8cdb-682602aa2a5c
   name: custom-1663238625
   namespace: n1
