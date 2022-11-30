@@ -1,0 +1,24 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: sdsdsd
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: sdsdsd
+  displayName: sdsdsd-chaos
+  experiments: null
+  faults: null
+  keywords:
+  - sdsdsd
+  provider:
+    name: ""
+  scenarios: null
