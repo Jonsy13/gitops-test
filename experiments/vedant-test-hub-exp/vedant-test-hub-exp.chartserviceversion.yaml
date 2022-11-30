@@ -1,0 +1,27 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: vedant-test-hub-exp
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: vedant-test-hub-exp
+  displayName: vedant-test-hub-exp-chaos
+  experiments: null
+  faults:
+  - description: ""
+    name: pod-delete-1hs
+  - description: ""
+    name: pod-autoscaler-hpi
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
