@@ -3,13 +3,13 @@ kind: Workflow
 metadata:
   creationTimestamp: null
   name: sdsdsd
-  namespace: ved-qa1
+  namespace: ns-1
 spec:
   arguments:
     parameters:
     - name: adminModeNamespace
-      value: ved-qa1
-  entrypoint: sdsdsdsd
+      value: ns-1
+  entrypoint: wedwsdsd
   podGC:
     strategy: OnWorkflowCompletion
   securityContext:
@@ -19,15 +19,15 @@ spec:
   templates:
   - inputs: {}
     metadata: {}
-    name: sdsdsdsd
+    name: wedwsdsd
     outputs: {}
     steps:
     - - arguments: {}
         name: install-chaos-faults
         template: install-chaos-faults
     - - arguments: {}
-        name: pod-delete-oi5
-        template: pod-delete-oi5
+        name: pod-delete-h6t
+        template: pod-delete-h6t
     - - arguments: {}
         name: cleanup-chaos-resources
         template: cleanup-chaos-resources
@@ -43,8 +43,8 @@ spec:
       resources: {}
     inputs:
       artifacts:
-      - name: pod-delete-oi5
-        path: /tmp/pod-delete-oi5.yaml
+      - name: pod-delete-h6t
+        path: /tmp/pod-delete-h6t.yaml
         raw:
           data: |
             apiVersion: litmuschaos.io/v1alpha1
@@ -215,22 +215,22 @@ spec:
     outputs: {}
   - container:
       args:
-      - -file=/tmp/chaosengine-pod-delete-oi5.yaml
+      - -file=/tmp/chaosengine-pod-delete-h6t.yaml
       - -saveName=/tmp/engine-name
       image: chaosnative/litmus-checker:2.11.0
       name: ""
       resources: {}
     inputs:
       artifacts:
-      - name: pod-delete-oi5
-        path: /tmp/chaosengine-pod-delete-oi5.yaml
+      - name: pod-delete-h6t
+        path: /tmp/chaosengine-pod-delete-h6t.yaml
         raw:
           data: |
             apiVersion: litmuschaos.io/v1alpha1
             kind: ChaosEngine
             metadata:
               namespace: "{{workflow.parameters.adminModeNamespace}}"
-              generateName: pod-delete-oi5
+              generateName: pod-delete-h6t
               labels:
                 workflow_run_id: "{{ workflow.uid }}"
             spec:
@@ -274,7 +274,7 @@ spec:
     metadata:
       labels:
         weight: "10"
-    name: pod-delete-oi5
+    name: pod-delete-h6t
     outputs: {}
 status:
   finishedAt: null
