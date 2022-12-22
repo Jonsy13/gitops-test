@@ -1,0 +1,25 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: construct-push-to-hub
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: construct-push-to-hub
+  displayName: construct-push-to-hub
+  experiments: null
+  faults: null
+  keywords:
+  - construct-push-to-hub
+  - sdd:wdwd
+  provider:
+    name: ""
+  scenarios: null
