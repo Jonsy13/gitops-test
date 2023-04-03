@@ -1,0 +1,23 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: upload-export-to-chaoshub-final-test
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: ""
+  displayName: upload-export-to-chaoshub-final-test
+  experiments: null
+  faults: null
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
