@@ -1,0 +1,23 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: test-cron-exp-3
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: ""
+  displayName: test-cron-exp-3
+  experiments: null
+  faults: null
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
