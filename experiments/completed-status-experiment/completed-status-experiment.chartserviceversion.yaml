@@ -1,0 +1,26 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: completed-status-experiment
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: ""
+  displayName: completed-status-experiment
+  experiments: null
+  faults:
+  - description: ""
+    displayName: ""
+    name: pod-delete-y4t
+  keywords: []
+  provider:
+    name: ""
+  scenarios: null
