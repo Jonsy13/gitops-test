@@ -1,0 +1,30 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: test-experiment-srm-zua
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: test-experiment-srm
+  displayName: test-experiment-srm-zua
+  experiments: null
+  faults:
+  - description: ""
+    displayName: ""
+    name: pod-delete-o5e
+  - description: ""
+    displayName: ""
+    name: pod-delete-o5e
+  keywords:
+  - test-experiment-srm
+  provider:
+    name: ""
+  scenarios: null
