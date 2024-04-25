@@ -13,6 +13,6 @@ jobs:
       with:
         image: jonsy13/namespace-checker
         digest: sha256:42aae95d06d9bae02b2f1cb71da0cff61d5a221e34a23400ebf06d616f6250f2
-        registry-username: ${{ github.actor }}
+        registry-username: ${{ secrets.DUSER }}
       secrets:
-        registry-password: ${{ secrets.GITHUB_TOKEN }}
+        registry-password: ${{ secrets.DPASS }}
