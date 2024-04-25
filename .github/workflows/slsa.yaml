@@ -1,0 +1,15 @@
+---
+name: SLSA
+on:
+  workflow_dispatch:
+
+jobs:
+  provenance:
+      permissions:
+        actions: read # for detecting the Github Actions environment.
+        id-token: write # for creating OIDC tokens for signing.
+        packages: write # for uploading attestations.
+      uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
+      with:
+        image: litmuschaos/litmusportal-server
+        digest: sha256:3289823a5b3a22eeb88ee7174ef0b266fba3b84aa312a52355b45b555b2e09ad
