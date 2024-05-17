@@ -1,0 +1,40 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  annotations:
+    categories: ""
+    chartDescription: ""
+    createdAt: ""
+    repository: ""
+    support: ""
+    vendor: ""
+  name: test-exp-1-38-x
+packageInfo:
+  experiments: null
+  packageName: ""
+spec:
+  categoryDescription: sdsdsds
+  displayName: test-exp-1-38-x
+  experiments: null
+  faults:
+  - description: ""
+    displayName: ""
+    name: pod-delete-42y
+    plan: null
+    supportedVersion: null
+  - description: ""
+    displayName: ""
+    name: pod-delete-xi4
+    plan: null
+    supportedVersion: null
+  - description: ""
+    displayName: ""
+    name: pod-cpu-hog-d9e
+    plan: null
+    supportedVersion: null
+  keywords:
+  - sdsdsd
+  plan: null
+  provider:
+    name: ""
+  scenarios: null

@@ -1,0 +1,294 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  creationTimestamp: null
+  labels:
+    sdsd: sdsd
+  name: test-exp-1-38-x
+  namespace: hce
+spec:
+  arguments:
+    parameters:
+    - name: adminModeNamespace
+      value: hce
+  entrypoint: test-exp-1-38-x
+  podMetadata:
+    annotations:
+      sdsd: sdsdsd
+  securityContext:
+    runAsGroup: 0
+    runAsNonRoot: true
+    runAsUser: 3000
+  serviceAccountName: argo-chaos
+  templates:
+  - inputs: {}
+    metadata: {}
+    name: test-exp-1-38-x
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: pod-delete-42y
+        template: pod-delete-42y
+      - arguments: {}
+        name: pod-cpu-hog-d9e
+        template: pod-cpu-hog-d9e
+    - - arguments: {}
+        name: pod-delete-xi4
+        template: pod-delete-xi4
+  - container:
+      args:
+      - -file=/tmp/chaosengine-pod-delete-42y.yaml
+      - -saveName=/tmp/engine-name
+      command:
+      - ./chaos-checker
+      image: docker.io/harness/chaos-go-runner:CHAOS-4948-latest
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: pod-delete-42y
+        path: /tmp/chaosengine-pod-delete-42y.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            kind: ChaosEngine
+            metadata:
+              namespace: "{{workflow.parameters.adminModeNamespace}}"
+              labels:
+                workflow_run_id: "{{ workflow.uid }}"
+                sdsd: sdsd
+                workflow_name: test-exp-1-38-x
+              annotations:
+                probeRef: '[{"name":"cmd-source-fail","mode":"SOT"}]'
+              generateName: pod-delete-42y
+            spec:
+              appinfo:
+                appns: hce
+                applabel: app=chaos-exporter
+                appkind: deployment
+              engineState: active
+              terminationGracePeriodSeconds: 30
+              chaosServiceAccount: litmus-admin
+              experiments:
+                - name: pod-delete
+                  image: docker.io/harness/chaos-go-runner:main-latest
+                  imagePullPolicy: Always
+                  args:
+                    - -c
+                    - ./experiments -name pod-delete
+                  command:
+                    - /bin/bash
+                  spec:
+                    components:
+                      env:
+                        - name: TOTAL_CHAOS_DURATION
+                          value: "30"
+                        - name: RAMP_TIME
+                          value: ""
+                        - name: FORCE
+                          value: "false"
+                        - name: CHAOS_INTERVAL
+                          value: "10"
+                        - name: PODS_AFFECTED_PERC
+                          value: ""
+                        - name: TARGET_CONTAINER
+                          value: ""
+                        - name: TARGET_PODS
+                          value: ""
+                        - name: DEFAULT_HEALTH_CHECK
+                          value: "false"
+                        - name: NODE_LABEL
+                          value: ""
+                        - name: SEQUENCE
+                          value: parallel
+                      securityContext:
+                        podSecurityContext:
+                          runAsUser: 4000
+                          runAsGroup: 0
+                      experimentAnnotations:
+                        sdsd: sdsdsd
+              jobCleanUpPolicy: retain
+              components:
+                runner:
+                  runnerAnnotation:
+                    sdsd: sdsdsd
+    metadata:
+      labels:
+        weight: "10"
+    name: pod-delete-42y
+    outputs: {}
+  - container:
+      args:
+      - -file=/tmp/chaosengine-pod-delete-xi4.yaml
+      - -saveName=/tmp/engine-name
+      command:
+      - ./chaos-checker
+      image: docker.io/harness/chaos-go-runner:CHAOS-4948-latest
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: pod-delete-xi4
+        path: /tmp/chaosengine-pod-delete-xi4.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            kind: ChaosEngine
+            metadata:
+              namespace: "{{workflow.parameters.adminModeNamespace}}"
+              labels:
+                workflow_run_id: "{{ workflow.uid }}"
+                sdsd: sdsd
+                workflow_name: test-exp-1-38-x
+              annotations:
+                probeRef: '[{"name":"httpprobe-res-body","mode":"EOT"}]'
+              generateName: pod-delete-xi4
+            spec:
+              appinfo:
+                appns: hce
+                applabel: app=chaos-exporter
+                appkind: deployment
+              engineState: active
+              terminationGracePeriodSeconds: 30
+              chaosServiceAccount: litmus-admin
+              experiments:
+                - name: pod-delete
+                  image: docker.io/harness/chaos-go-runner:main-latest
+                  imagePullPolicy: Always
+                  args:
+                    - -c
+                    - ./experiments -name pod-delete
+                  command:
+                    - /bin/bash
+                  spec:
+                    components:
+                      env:
+                        - name: TOTAL_CHAOS_DURATION
+                          value: "30"
+                        - name: RAMP_TIME
+                          value: ""
+                        - name: FORCE
+                          value: "false"
+                        - name: CHAOS_INTERVAL
+                          value: "10"
+                        - name: PODS_AFFECTED_PERC
+                          value: ""
+                        - name: TARGET_CONTAINER
+                          value: ""
+                        - name: TARGET_PODS
+                          value: ""
+                        - name: DEFAULT_HEALTH_CHECK
+                          value: "false"
+                        - name: NODE_LABEL
+                          value: ""
+                        - name: SEQUENCE
+                          value: parallel
+                      securityContext:
+                        podSecurityContext:
+                          runAsUser: 2000
+                          runAsGroup: 0
+                      experimentAnnotations:
+                        sdsd: sdsdsd
+              jobCleanUpPolicy: retain
+              components:
+                runner:
+                  runnerAnnotation:
+                    sdsd: sdsdsd
+    metadata:
+      labels:
+        weight: "10"
+    name: pod-delete-xi4
+    outputs: {}
+  - container:
+      args:
+      - -file=/tmp/chaosengine-pod-cpu-hog-d9e.yaml
+      - -saveName=/tmp/engine-name
+      command:
+      - ./chaos-checker
+      image: docker.io/harness/chaos-go-runner:CHAOS-4948-latest
+      name: ""
+      resources: {}
+    inputs:
+      artifacts:
+      - name: pod-cpu-hog-d9e
+        path: /tmp/chaosengine-pod-cpu-hog-d9e.yaml
+        raw:
+          data: |
+            apiVersion: litmuschaos.io/v1alpha1
+            kind: ChaosEngine
+            metadata:
+              namespace: "{{workflow.parameters.adminModeNamespace}}"
+              labels:
+                workflow_run_id: "{{ workflow.uid }}"
+                sdsd: sdsd
+                workflow_name: test-exp-1-38-x
+              annotations:
+                probeRef: '[{"name":"cmd-source-fail","mode":"EOT"}]'
+              generateName: pod-cpu-hog-d9e
+            spec:
+              engineState: active
+              terminationGracePeriodSeconds: 30
+              appinfo:
+                appns: hce
+                applabel: app=chaos-exporter
+                appkind: deployment
+              chaosServiceAccount: litmus-admin
+              experiments:
+                - name: pod-cpu-hog
+                  image: docker.io/harness/chaos-go-runner:main-latest
+                  imagePullPolicy: Always
+                  args:
+                    - -c
+                    - ./experiments -name pod-cpu-hog
+                  command:
+                    - /bin/bash
+                  spec:
+                    components:
+                      env:
+                        - name: TOTAL_CHAOS_DURATION
+                          value: "30"
+                        - name: CPU_CORES
+                          value: "1"
+                        - name: CPU_LOAD
+                          value: "100"
+                        - name: PODS_AFFECTED_PERC
+                          value: ""
+                        - name: RAMP_TIME
+                          value: ""
+                        - name: LIB_IMAGE
+                          value: docker.io/harness/chaos-go-runner:main-latest
+                        - name: STRESS_IMAGE
+                          value: alexeiled/stress-ng:latest-ubuntu
+                        - name: CONTAINER_RUNTIME
+                          value: containerd
+                        - name: SOCKET_PATH
+                          value: /run/containerd/containerd.sock
+                        - name: TARGET_CONTAINER
+                          value: ""
+                        - name: TARGET_PODS
+                          value: ""
+                        - name: DEFAULT_HEALTH_CHECK
+                          value: "false"
+                        - name: NODE_LABEL
+                          value: ""
+                        - name: SEQUENCE
+                          value: parallel
+                      securityContext:
+                        podSecurityContext:
+                          runAsUser: 2000
+                          runAsGroup: 0
+                      experimentAnnotations:
+                        sdsd: sdsdsd
+              jobCleanUpPolicy: retain
+              components:
+                runner:
+                  runnerAnnotation:
+                    sdsd: sdsdsd
+    metadata:
+      labels:
+        weight: "10"
+    name: pod-cpu-hog-d9e
+    outputs: {}
+status:
+  finishedAt: null
+  startedAt: null
